@@ -27,7 +27,7 @@
   --grand: #e0f5f1;
   --shadow: 0 10px 30px rgba(20, 40, 80, .10);
   --shadow-sm: 0 2px 8px rgba(20, 40, 80, .08);
-  --max-w: 780px;
+  --max-w: 1100px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -380,8 +380,9 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
     <h1>Yatzy</h1>
     <div class="header-actions">
       <button id="btn-add-player" class="btn btn-ghost" data-i18n="addPlayer">+ Spieler</button>
-      <button id="btn-settings" class="btn btn-ghost" title="Einstellungen">⚙</button>
-      <button id="btn-new-game" class="btn btn-ghost" title="Neues Spiel">↺</button>
+      <button id="btn-settings" class="btn btn-ghost" data-i18n-title="settingsTitle" title="Einstellungen">⚙</button>
+      <button id="btn-delete-players" class="btn btn-ghost" data-i18n-title="deleteAllPlayers" title="Alle Spieler löschen">🗑</button>
+      <button id="btn-new-game" class="btn btn-ghost" data-i18n-title="newGame" title="Neues Spiel">↺</button>
     </div>
   </header>
 
@@ -530,6 +531,9 @@ const I18N = {
     settingsTitle: 'Einstellungen',
     resetDefaults: 'Zurücksetzen',
     language: 'Sprache',
+    newGame: 'Neues Spiel',
+    deleteAllPlayers: 'Alle Spieler löschen',
+    deleteAllConfirm: 'Alle Spieler wirklich löschen?',
     bonusBlock: 'Bonus im oberen Teil',
     bonusIf: 'Bonus wenn obere Summe ≥',
     bonusPoints: 'Bonuspunkte',
@@ -583,6 +587,9 @@ const I18N = {
     settingsTitle: 'Settings',
     resetDefaults: 'Reset defaults',
     language: 'Language',
+    newGame: 'New game',
+    deleteAllPlayers: 'Delete all players',
+    deleteAllConfirm: 'Delete all players?',
     bonusBlock: 'Upper section bonus',
     bonusIf: 'Bonus if upper sum ≥',
     bonusPoints: 'Bonus points',
@@ -644,6 +651,10 @@ function applyStaticI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const val = t(el.dataset.i18n);
     if (typeof val === 'string') el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const val = t(el.dataset.i18nTitle);
+    if (typeof val === 'string') el.title = val;
   });
   document.querySelectorAll('.lang-switch .btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
@@ -1084,6 +1095,14 @@ document.querySelectorAll('.lang-switch .btn').forEach(btn => {
 document.getElementById('btn-add-player').onclick = () => openNameModal(null);
 document.getElementById('btn-settings').onclick = openSettings;
 document.getElementById('btn-back').onclick = closeSettings;
+document.getElementById('btn-delete-players').onclick = () => {
+  if (!game.players.length) return;
+  if (!confirm(t('deleteAllConfirm'))) return;
+  game.players = [];
+  game.scores = {};
+  saveGame();
+  renderSheet();
+};
 document.getElementById('btn-new-game').onclick = () => {
   if (!confirm(t('newGameConfirm'))) return;
   game.scores = {};
